@@ -1,6 +1,6 @@
 # Bharat-Herald---Strategic-Intelligence-Report
 
-🎯 Objectives
+##🎯 Objectives
 
 
 Analyze print circulation trends (2019–2024)
@@ -22,8 +22,9 @@ Recommend a data-driven digital strategy
 
 
 
-📊 Key Insights
-📉 Print Decline
+##📊 Key Insights
+
+###📉 Print Decline
 
 
 Circulation dropped from 1.2M+ to <560K copies
@@ -32,7 +33,7 @@ Circulation dropped from 1.2M+ to <560K copies
 Overall decline of ~25% in recent years
 
 
-🧾 Print Inefficiency
+###🧾 Print Inefficiency
 
 
 Print waste reached ~10%
@@ -50,7 +51,7 @@ Ad revenue declined across most categories
 Strong dependency on government & real estate ads
 
 
-🏙️ City-Level Insights
+###🏙️ City-Level Insights
 
 
 Patna → Highest ROI (stable ads + digital engagement)
@@ -62,7 +63,7 @@ Jaipur → High waste, needs optimization
 Varanasi, Lucknow, Kanpur → High digital readiness
 
 
-📱 Digital Pilot Findings
+###📱 Digital Pilot Findings
 
 
 High bounce rates (poor UX)
@@ -75,7 +76,7 @@ Clear mismatch between product and user behavior
 
 
 
-🚀 Strategic Recommendations
+##🚀 Strategic Recommendations
 Phase 1: Relaunch (0–6 months)
 
 
