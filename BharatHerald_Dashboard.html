@@ -1,0 +1,1033 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Bharat Herald — Strategic Intelligence Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;500&family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+  :root {
+    --navy: #060e1a;
+    --navy2: #0c1c30;
+    --navy3: #112240;
+    --card: #0d1f38;
+    --border: #1a3356;
+    --emerald: #00e5a0;
+    --amber: #f5a623;
+    --crimson: #ff4d5e;
+    --blue: #3d9bff;
+    --purple: #a855f7;
+    --text: #c8d8ec;
+    --muted: #4a6080;
+    --white: #e8f0fb;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Instrument Sans', sans-serif;
+    background: var(--navy);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+  /* Subtle grid texture */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(0,229,160,0.015) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,229,160,0.015) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ── HEADER ── */
+  header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(6,14,26,0.96);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 32px;
+    height: 68px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .logo-block { display: flex; flex-direction: column; gap: 2px; }
+  .logo-eye {
+    font-size: 10px;
+    letter-spacing: 4px;
+    color: var(--emerald);
+    text-transform: uppercase;
+    font-family: 'IBM Plex Mono', monospace;
+  }
+  .logo-name {
+    font-family: 'Syne', sans-serif;
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--white);
+    letter-spacing: -0.5px;
+  }
+  .header-kpis { display: flex; gap: 28px; align-items: center; }
+  .hkpi { text-align: right; }
+  .hkpi-label { font-size: 10px; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; }
+  .hkpi-val { font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 700; }
+  .hkpi-sub { font-size: 11px; font-family: 'IBM Plex Mono', monospace; }
+  .sep { width: 1px; height: 40px; background: var(--border); }
+  .reset-btn {
+    background: transparent;
+    border: 1px solid var(--emerald);
+    color: var(--emerald);
+    padding: 7px 18px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 600;
+    font-family: 'IBM Plex Mono', monospace;
+    letter-spacing: 1px;
+    transition: all 0.2s;
+  }
+  .reset-btn:hover { background: var(--emerald); color: var(--navy); }
+
+  /* ── LAYOUT ── */
+  main { position: relative; z-index: 1; padding: 20px 28px; max-width: 1700px; margin: 0 auto; }
+
+  /* ── FILTERS ── */
+  .filters-bar {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 20px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    align-items: flex-start;
+    margin-bottom: 18px;
+  }
+  .filter-group { display: flex; flex-direction: column; gap: 6px; }
+  .filter-label { font-size: 9px; color: var(--muted); letter-spacing: 2px; text-transform: uppercase; font-family: 'IBM Plex Mono', monospace; }
+  .pill-row { display: flex; flex-wrap: wrap; gap: 5px; }
+  .pill {
+    padding: 4px 11px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    cursor: pointer;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--muted);
+    background: transparent;
+    transition: all 0.15s;
+    font-family: 'Instrument Sans', sans-serif;
+  }
+  .pill:hover { border-color: var(--blue); color: var(--blue); }
+  .pill.active-emerald { border-color: var(--emerald); color: var(--emerald); background: rgba(0,229,160,0.1); }
+  .pill.active-amber { border-color: var(--amber); color: var(--amber); background: rgba(245,166,35,0.1); }
+  .pill.active-blue { border-color: var(--blue); color: var(--blue); background: rgba(61,155,255,0.1); }
+  .pill.active-purple { border-color: var(--purple); color: var(--purple); background: rgba(168,85,247,0.1); }
+
+  /* ── INSIGHT BANNERS ── */
+  .insight {
+    border-radius: 8px;
+    padding: 11px 16px;
+    margin-bottom: 14px;
+    font-size: 12.5px;
+    line-height: 1.6;
+    border-left-width: 3px;
+    border-left-style: solid;
+  }
+  .insight.red { border-color: var(--crimson); background: rgba(255,77,94,0.07); }
+  .insight.purple { border-color: var(--purple); background: rgba(168,85,247,0.07); }
+  .insight.green { border-color: var(--emerald); background: rgba(0,229,160,0.07); }
+  .insight.amber { border-color: var(--amber); background: rgba(245,166,35,0.07); }
+  .insight strong { font-weight: 700; }
+
+  /* ── SECTION HEADER ── */
+  .zone-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 14px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+  .zone-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .zone-title { font-family: 'Syne', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: var(--muted); }
+
+  /* ── CARDS & GRID ── */
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+  .grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+  .grid32 { display: grid; grid-template-columns: 1.5fr 1fr; gap: 14px; margin-bottom: 14px; }
+  .grid5 { display: grid; grid-template-columns: repeat(5,1fr); gap: 10px; margin-bottom: 14px; }
+
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 18px 20px;
+    position: relative;
+    overflow: hidden;
+  }
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, rgba(0,229,160,0.2), transparent);
+  }
+  .card-title { font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 700; color: var(--white); margin-bottom: 3px; }
+  .card-sub { font-size: 11px; color: var(--muted); margin-bottom: 14px; }
+  .chart-src { font-size: 9px; color: #2a4060; margin-top: 8px; font-family: 'IBM Plex Mono', monospace; }
+  canvas { max-width: 100%; }
+
+  /* ── KPI TILES ── */
+  .kpi-tile {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+    text-align: center;
+  }
+  .kpi-label { font-size: 9px; color: var(--muted); letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 6px; font-family: 'IBM Plex Mono', monospace; }
+  .kpi-val { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 800; line-height: 1; margin-bottom: 4px; }
+  .kpi-sub { font-size: 10px; color: var(--muted); margin-bottom: 6px; }
+  .kpi-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 12px; font-family: 'IBM Plex Mono', monospace; }
+
+  /* ── FUNNEL BARS ── */
+  .funnel-item { margin-bottom: 10px; }
+  .funnel-header { display: flex; justify-content: space-between; margin-bottom: 3px; }
+  .funnel-city { font-size: 11px; color: var(--text); }
+  .funnel-pct { font-size: 11px; font-weight: 700; font-family: 'IBM Plex Mono', monospace; }
+  .funnel-track { background: var(--navy3); border-radius: 3px; height: 5px; }
+  .funnel-fill { height: 5px; border-radius: 3px; transition: width 0.4s; }
+  .funnel-detail { font-size: 9px; color: var(--muted); margin-top: 2px; font-family: 'IBM Plex Mono', monospace; }
+
+  /* ── ROADMAP ── */
+  .roadmap {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 14px;
+    margin-bottom: 14px;
+  }
+  .roadmap-phase {
+    border-radius: 10px;
+    padding: 18px;
+    border-top-width: 3px;
+    border-top-style: solid;
+    border-right: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    border-left: 1px solid var(--border);
+  }
+  .roadmap-eyebrow { font-size: 9px; letter-spacing: 3px; text-transform: uppercase; font-family: 'IBM Plex Mono', monospace; font-weight: 500; margin-bottom: 3px; }
+  .roadmap-name { font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 800; color: var(--white); margin-bottom: 8px; }
+  .roadmap-period { display: inline-block; font-size: 10px; font-weight: 600; padding: 3px 10px; border-radius: 20px; margin-bottom: 14px; font-family: 'IBM Plex Mono', monospace; }
+  .roadmap-list { list-style: none; }
+  .roadmap-list li { font-size: 12px; color: #7a9ab8; margin-bottom: 7px; padding-left: 14px; position: relative; line-height: 1.5; }
+  .roadmap-list li::before { content: '›'; position: absolute; left: 0; font-weight: 700; }
+
+  footer { text-align: center; padding: 16px 0 24px; font-size: 10px; color: #1e3a56; font-family: 'IBM Plex Mono', monospace; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .card, .kpi-tile, .roadmap-phase, .filters-bar, .insight {
+    animation: fadeUp 0.4s ease both;
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="logo-block">
+    <span class="logo-eye">Strategic Intelligence Dashboard</span>
+    <span class="logo-name">BHARAT HERALD</span>
+  </div>
+  <div class="header-kpis">
+    <div class="hkpi">
+      <div class="hkpi-label">Total Revenue 2024</div>
+      <div class="hkpi-val" style="color:var(--crimson)">₹36.7 Cr</div>
+      <div class="hkpi-sub" style="color:var(--crimson)">▼ 0.6% YoY</div>
+    </div>
+    <div class="sep"></div>
+    <div class="hkpi">
+      <div class="hkpi-label">Avg Monthly Circ</div>
+      <div class="hkpi-val" style="color:var(--amber)">247K</div>
+      <div class="hkpi-sub" style="color:var(--crimson)">▼ 25.2% from peak</div>
+    </div>
+    <div class="sep"></div>
+    <div class="hkpi">
+      <div class="hkpi-label">Pilot Bounce Rate</div>
+      <div class="hkpi-val" style="color:var(--crimson)">65.8%</div>
+      <div class="hkpi-sub" style="color:var(--muted)">Industry max: 60%</div>
+    </div>
+    <div class="sep"></div>
+    <button class="reset-btn" onclick="resetFilters()">↺ RESET</button>
+  </div>
+</header>
+
+<main>
+
+<!-- FILTERS -->
+<div class="filters-bar">
+  <div class="filter-group">
+    <div class="filter-label">Year Range</div>
+    <div class="pill-row" id="yr-pills">
+      <button class="pill active-emerald" data-yr="2019" onclick="toggleYear(this)">2019</button>
+      <button class="pill active-emerald" data-yr="2020" onclick="toggleYear(this)">2020</button>
+      <button class="pill active-emerald" data-yr="2021" onclick="toggleYear(this)">2021</button>
+      <button class="pill active-emerald" data-yr="2022" onclick="toggleYear(this)">2022</button>
+      <button class="pill active-emerald" data-yr="2023" onclick="toggleYear(this)">2023</button>
+      <button class="pill active-emerald" data-yr="2024" onclick="toggleYear(this)">2024</button>
+    </div>
+  </div>
+  <div class="filter-group">
+    <div class="filter-label">Ad Category</div>
+    <div class="pill-row" id="cat-pills">
+      <button class="pill active-blue" data-cat="A001" onclick="toggleCat(this)">Government</button>
+      <button class="pill active-blue" data-cat="A002" onclick="toggleCat(this)">FMCG</button>
+      <button class="pill active-blue" data-cat="A003" onclick="toggleCat(this)">Real Estate</button>
+      <button class="pill active-blue" data-cat="A004" onclick="toggleCat(this)">Automobile</button>
+    </div>
+  </div>
+  <div class="filter-group">
+    <div class="filter-label">City Tier</div>
+    <div class="pill-row" id="tier-pills">
+      <button class="pill active-amber" data-tier="All" onclick="toggleTier(this)">All</button>
+      <button class="pill" data-tier="Tier 1" onclick="toggleTier(this)">Tier 1</button>
+      <button class="pill" data-tier="Tier 2" onclick="toggleTier(this)">Tier 2</button>
+      <button class="pill" data-tier="Tier 3" onclick="toggleTier(this)">Tier 3</button>
+    </div>
+  </div>
+  <div class="filter-group">
+    <div class="filter-label">Platform</div>
+    <div class="pill-row" id="plat-pills">
+      <button class="pill active-purple" data-plat="Both" onclick="togglePlat(this)">Both</button>
+      <button class="pill" data-plat="WhatsApp" onclick="togglePlat(this)">WhatsApp</button>
+      <button class="pill" data-plat="E-paper" onclick="togglePlat(this)">E-paper</button>
+    </div>
+  </div>
+  <div class="filter-group">
+    <div class="filter-label">Cities</div>
+    <div class="pill-row" id="city-pills">
+      <button class="pill active-emerald" data-city="Ahmedabad" onclick="toggleCity(this)">Ahmedabad</button>
+      <button class="pill active-emerald" data-city="Bhopal" onclick="toggleCity(this)">Bhopal</button>
+      <button class="pill active-emerald" data-city="Delhi" onclick="toggleCity(this)">Delhi</button>
+      <button class="pill active-emerald" data-city="Jaipur" onclick="toggleCity(this)">Jaipur</button>
+      <button class="pill active-emerald" data-city="Kanpur" onclick="toggleCity(this)">Kanpur</button>
+      <button class="pill active-emerald" data-city="Lucknow" onclick="toggleCity(this)">Lucknow</button>
+      <button class="pill active-emerald" data-city="Mumbai" onclick="toggleCity(this)">Mumbai</button>
+      <button class="pill active-emerald" data-city="Patna" onclick="toggleCity(this)">Patna</button>
+      <button class="pill active-emerald" data-city="Ranchi" onclick="toggleCity(this)">Ranchi</button>
+      <button class="pill active-emerald" data-city="Varanasi" onclick="toggleCity(this)">Varanasi</button>
+    </div>
+  </div>
+</div>
+
+<!-- ZONE A -->
+<div class="insight red">
+  <strong style="color:var(--crimson)">⚠ ZONE A — THE DECLINE: </strong>
+  Print ad revenue peaked at ₹34.7L in Q3-2019 (Government) and has contracted every year since. Net circulation has fallen <strong>25.2%</strong> from a peak of 330K monthly copies in 2019 to 247K in 2024 — a structural, not cyclical, decline.
+</div>
+
+<div class="grid2">
+  <div class="card">
+    <div class="card-title">📈 Ad Revenue Trend by Category</div>
+    <div class="card-sub">Quarterly revenue (₹ Lakhs) · All editions aggregated</div>
+    <canvas id="revTrendChart" height="200"></canvas>
+    <div class="chart-src">Source: Bharat Herald Operations Data 2019–2024</div>
+  </div>
+  <div class="card">
+    <div class="card-title">📉 Net Circulation Decline</div>
+    <div class="card-sub">Monthly net copies (thousands) · COVID dip annotated</div>
+    <canvas id="circChart" height="200"></canvas>
+    <div class="chart-src">Source: Bharat Herald Operations Data 2019–2024</div>
+  </div>
+</div>
+
+<div class="grid3">
+  <div class="card">
+    <div class="card-title">🔗 Revenue vs. Circulation Correlation</div>
+    <div class="card-sub">Both metrics declining in lockstep — the core existential chart</div>
+    <canvas id="dualChart" height="200"></canvas>
+    <div class="chart-src">Source: Bharat Herald Operations Data 2019–2024</div>
+  </div>
+  <div class="card">
+    <div class="card-title">🏙️ Revenue by City Edition</div>
+    <div class="card-sub">Total cumulative 2019–2024 (₹ Crores)</div>
+    <canvas id="cityRevChart" height="200"></canvas>
+    <div class="chart-src">Source: Bharat Herald Operations Data 2019–2024</div>
+  </div>
+  <div class="card">
+    <div class="card-title">📦 Print Return Rate by City</div>
+    <div class="card-sub">Amber &gt;5% · Red &gt;8% · Overprinting waste signal</div>
+    <canvas id="returnChart" height="200"></canvas>
+    <div class="chart-src">Source: Bharat Herald Operations Data 2019–2024</div>
+  </div>
+</div>
+
+<!-- ZONE B -->
+<div class="insight purple">
+  <strong style="color:var(--purple)">⚡ ZONE B — DIGITAL PILOT AUTOPSY: </strong>
+  The 2021 digital pilot spent <strong>₹122 Lakhs</strong> across both platforms but achieved only <strong>54.6%</strong> average conversion. Ranchi (PDF WhatsApp) hit an 83% bounce rate — the highest recorded. Delhi's E-paper had 71.4% bounce. UX and content were not ready for digital audiences.
+</div>
+
+<div class="grid3">
+  <div class="card">
+    <div class="card-title">🎯 Bounce Rate by City & Platform</div>
+    <div class="card-sub">60% = industry threshold · Above = critical failure</div>
+    <canvas id="bounceChart" height="200"></canvas>
+    <div class="chart-src">Source: Bharat Herald Digital Pilot 2021</div>
+  </div>
+  <div class="card">
+    <div class="card-title">💰 Cost vs. Conversion Scatter</div>
+    <div class="card-sub">Each bubble = city+platform · Quadrant analysis</div>
+    <canvas id="scatterChart" height="200"></canvas>
+    <div class="chart-src">Source: Bharat Herald Digital Pilot 2021</div>
+  </div>
+  <div class="card">
+    <div class="card-title">📊 Download Conversion Funnel</div>
+    <div class="card-sub">Users Reached → Actual Downloads</div>
+    <div id="funnelList" style="padding-top:4px; overflow-y:auto; max-height:210px;"></div>
+    <div class="chart-src">Source: Bharat Herald Digital Pilot 2021</div>
+  </div>
+</div>
+
+<!-- ZONE C -->
+<div class="insight green">
+  <strong style="color:var(--emerald)">🚀 ZONE C — THE OPPORTUNITY: </strong>
+  Varanasi (78.7%), Kanpur (76.7%), Ranchi (75.9%), and Lucknow (75.1%) have all crossed the <strong>70% smartphone threshold</strong>. These are the highest-priority cities for a digital relaunch. Varanasi alone generates ₹237 Cr total revenue with strong upside.
+</div>
+
+<div class="grid3">
+  <div class="card">
+    <div class="card-title">🕸️ Digital Readiness Radar (2024-Q4)</div>
+    <div class="card-sub">Top 5 cities · Literacy, Smartphone & Internet penetration</div>
+    <canvas id="radarChart" height="230"></canvas>
+    <div class="chart-src">Source: Bharat Herald City Readiness Data 2024</div>
+  </div>
+  <div class="card">
+    <div class="card-title">📱 Smartphone Penetration Trend</div>
+    <div class="card-sub">70% = digital readiness threshold</div>
+    <canvas id="smartChart" height="230"></canvas>
+    <div class="chart-src">Source: Bharat Herald City Readiness Data 2019–2024</div>
+  </div>
+  <div class="card">
+    <div class="card-title">💎 Digital Revenue Recovery Potential</div>
+    <div class="card-sub">Current annual vs estimated potential with digital adoption</div>
+    <canvas id="potentialChart" height="230"></canvas>
+    <div class="chart-src">Source: Bharat Herald Operations + Readiness Data</div>
+  </div>
+</div>
+
+<!-- ZONE D KPIs -->
+<div class="insight amber">
+  <strong style="color:var(--amber)">📌 ZONE D — STRATEGIC SIGNALS: </strong>
+  Bharat Herald is <strong>~31%</strong> dependent on Government advertising. A loss of this category would eliminate ≈₹11.4 Cr from annual revenue. Varanasi is the highest-revenue edition. Jaipur (₹194 Cr) is the lowest — flagged for strategic review.
+</div>
+
+<div class="grid5">
+  <div class="kpi-tile" style="border-top:2px solid var(--crimson)">
+    <div class="kpi-label">Total Revenue 2024</div>
+    <div class="kpi-val" style="color:var(--crimson)">₹36.7 Cr</div>
+    <div class="kpi-sub">vs ₹36.9 Cr (2023)</div>
+    <span class="kpi-badge" style="background:rgba(255,77,94,0.15);color:var(--crimson)">▼ 0.6% YoY</span>
+  </div>
+  <div class="kpi-tile" style="border-top:2px solid var(--crimson)">
+    <div class="kpi-label">Avg Monthly Circulation</div>
+    <div class="kpi-val" style="color:var(--amber)">247K</div>
+    <div class="kpi-sub">Peak: 330K (2019)</div>
+    <span class="kpi-badge" style="background:rgba(255,77,94,0.15);color:var(--crimson)">▼ 25.2% decline</span>
+  </div>
+  <div class="kpi-tile" style="border-top:2px solid var(--amber)">
+    <div class="kpi-label">Print Return Rate</div>
+    <div class="kpi-val" style="color:var(--amber)">5.93%</div>
+    <div class="kpi-sub">Company-wide overprinting</div>
+    <span class="kpi-badge" style="background:rgba(245,166,35,0.15);color:var(--amber)">Moderate Risk</span>
+  </div>
+  <div class="kpi-tile" style="border-top:2px solid var(--purple)">
+    <div class="kpi-label">Pilot Investment</div>
+    <div class="kpi-val" style="color:var(--purple)">₹122L</div>
+    <div class="kpi-sub">2021 Digital Pilot Total</div>
+    <span class="kpi-badge" style="background:rgba(168,85,247,0.15);color:var(--purple)">Both Platforms</span>
+  </div>
+  <div class="kpi-tile" style="border-top:2px solid var(--crimson)">
+    <div class="kpi-label">Avg Pilot Conversion</div>
+    <div class="kpi-val" style="color:var(--crimson)">54.6%</div>
+    <div class="kpi-sub">Avg Bounce: 65.8%</div>
+    <span class="kpi-badge" style="background:rgba(255,77,94,0.15);color:var(--crimson)">Below Target</span>
+  </div>
+</div>
+
+<div class="grid32">
+  <div class="card">
+    <div class="card-title">🫧 Digital Readiness vs. Revenue (Opportunity Map)</div>
+    <div class="card-sub">High smartphone % + lower revenue = highest ROI targets for digital pivot</div>
+    <canvas id="bubbleChart" height="200"></canvas>
+    <div class="chart-src">Source: Bharat Herald City Readiness + Revenue Data 2024</div>
+  </div>
+  <div class="card">
+    <div class="card-title">🥧 Ad Revenue Mix — 2024</div>
+    <div class="card-sub">Revenue concentration risk · Government dependency flagged</div>
+    <canvas id="pieChart" height="200"></canvas>
+    <div class="chart-src">Source: Bharat Herald Operations Data 2024</div>
+  </div>
+</div>
+
+<!-- ROADMAP -->
+<div class="zone-header">
+  <div class="zone-dot" style="background:var(--emerald)"></div>
+  <div class="zone-title">Strategic Roadmap — 3-Phase Recovery Plan</div>
+</div>
+<div class="roadmap">
+  <div class="roadmap-phase" style="border-top-color:var(--crimson); background:rgba(255,77,94,0.04)">
+    <div class="roadmap-eyebrow" style="color:var(--crimson)">Phase 1</div>
+    <div class="roadmap-name">STABILIZE</div>
+    <span class="roadmap-period" style="background:rgba(255,77,94,0.15);color:var(--crimson)">0–6 Months</span>
+    <ul class="roadmap-list" style="--li-color:var(--crimson)">
+      <li style="--before-color:var(--crimson)">Cut print overprinting in high-return cities (Ahmedabad 6.4%, Delhi 6.3%)</li>
+      <li>Renegotiate advertiser contracts — prioritise FMCG & Government categories</li>
+      <li>Freeze digital pilot spend until UX is fully rebuilt from ground up</li>
+      <li>Emergency audit: identify 2–3 editions for consolidation or downscaling</li>
+    </ul>
+  </div>
+  <div class="roadmap-phase" style="border-top-color:var(--amber); background:rgba(245,166,35,0.04)">
+    <div class="roadmap-eyebrow" style="color:var(--amber)">Phase 2</div>
+    <div class="roadmap-name">REBUILD</div>
+    <span class="roadmap-period" style="background:rgba(245,166,35,0.15);color:var(--amber)">6–18 Months</span>
+    <ul class="roadmap-list">
+      <li>Relaunch mobile-first WhatsApp content in Varanasi, Kanpur & Lucknow (>75% smartphone)</li>
+      <li>Build regional content hubs with vernacular-first editorial strategy</li>
+      <li>Launch digital ad packages for Real Estate & Automobile categories</li>
+      <li>Deploy advertiser performance dashboards to rebuild confidence</li>
+    </ul>
+  </div>
+  <div class="roadmap-phase" style="border-top-color:var(--emerald); background:rgba(0,229,160,0.04)">
+    <div class="roadmap-eyebrow" style="color:var(--emerald)">Phase 3</div>
+    <div class="roadmap-name">GROW</div>
+    <span class="roadmap-period" style="background:rgba(0,229,160,0.15);color:var(--emerald)">18–36 Months</span>
+    <ul class="roadmap-list">
+      <li>Full digital-first strategy for all Tier 2 cities crossing the 70% smartphone threshold</li>
+      <li>Subscription model pilot in Tier 1 cities — Mumbai, Delhi, Ahmedabad</li>
+      <li>Cross-state programmatic ad network leveraging 10-city reach at scale</li>
+      <li>Data monetisation: readership analytics as premium ad intelligence product</li>
+    </ul>
+  </div>
+</div>
+
+</main>
+<footer>Bharat Herald CEO & CFO Strategic Intelligence Dashboard · Data Period: 2019–2024 · 10 City Editions · 5+ Indian States</footer>
+
+<script>
+// ═══════════════════════════════════════════════════════
+// DATA
+// ═══════════════════════════════════════════════════════
+const QUARTERS = ["Q1-2019","Q2-2019","Q3-2019","Q4-2019","Q1-2020","Q2-2020","Q3-2020","Q4-2020","Q1-2021","Q2-2021","Q3-2021","Q4-2021","Q1-2022","Q2-2022","Q3-2022","Q4-2022","Q1-2023","Q2-2023","Q3-2023","Q4-2023","Q1-2024","Q2-2024","Q3-2024","Q4-2024"];
+const CITY_LIST = ["Ahmedabad","Bhopal","Delhi","Jaipur","Kanpur","Lucknow","Mumbai","Patna","Ranchi","Varanasi"];
+const CITY_TIER = {Ahmedabad:"Tier 1",Bhopal:"Tier 2",Delhi:"Tier 1",Jaipur:"Tier 2",Kanpur:"Tier 2",Lucknow:"Tier 2",Mumbai:"Tier 1",Patna:"Tier 2",Ranchi:"Tier 3",Varanasi:"Tier 2"};
+const CITY_COLORS = ["#3d9bff","#f5a623","#ff4d5e","#00e5a0","#a855f7","#fb923c","#22d3ee","#a3e635","#f472b6","#818cf8"];
+
+const RAW_REV = {"Q1-2019":{A001:24810243,A002:18385928,A003:14614962,A004:16956238},"Q2-2019":{A001:31037149,A002:14633329,A003:28905868,A004:15793032},"Q3-2019":{A001:34656394,A002:19051572,A003:26204303,A004:9807712},"Q4-2019":{A001:17655299,A002:18378947,A003:29482700,A004:26747572},"Q1-2020":{A001:30657104,A002:16564148,A003:25940965,A004:15056862},"Q2-2020":{A001:21884691,A002:19389226,A003:25294770,A004:19305162},"Q3-2020":{A001:25189459,A002:17680800,A003:27754357,A004:11469663},"Q4-2020":{A001:22297456,A002:15553837,A003:28291499,A004:16977090},"Q1-2021":{A001:32770279,A002:12284989,A003:31508037,A004:16232719},"Q2-2021":{A001:27240089,A002:21287571,A003:30136851,A004:12024441},"Q3-2021":{A001:24509037,A002:18088303,A003:25403249,A004:13527569},"Q4-2021":{A001:20060821,A002:16427340,A003:22892433,A004:19451695},"Q1-2022":{A001:23175989,A002:16208622,A003:28218082,A004:17885207},"Q2-2022":{A001:22244478,A002:19399749,A003:22476049,A004:15609311},"Q3-2022":{A001:26613989,A002:18009375,A003:22977930,A004:13226024},"Q4-2022":{A001:20875785,A002:15476499,A003:24048502,A004:16478614},"Q1-2023":{A001:24512341,A002:19003601,A003:24416578,A004:21039746},"Q2-2023":{A001:23065888,A002:17277834,A003:22478066,A004:14527991},"Q3-2023":{A001:22079540,A002:17699614,A003:21987540,A004:15083870},"Q4-2023":{A001:23232363,A002:15912717,A003:22042220,A004:16563075},"Q1-2024":{A001:23659011,A002:18164890,A003:21971341,A004:14971538},"Q2-2024":{A001:23145991,A002:18544829,A003:20892443,A004:14682009},"Q3-2024":{A001:22978340,A002:17239011,A003:21144303,A004:14011239},"Q4-2024":{A001:22011239,A002:16782003,A003:20549801,A004:13661099}};
+
+const CIRC = {"2019-01":3271938,"2019-02":3249902,"2019-03":3326328,"2019-04":3342238,"2019-05":3325422,"2019-06":3360120,"2019-07":3280557,"2019-08":3299501,"2019-09":3267681,"2019-10":3296250,"2019-11":3258810,"2019-12":3337082,"2020-01":3174210,"2020-02":3182430,"2020-03":2998751,"2020-04":2621834,"2020-05":2743910,"2020-06":2876421,"2020-07":2980341,"2020-08":3021892,"2020-09":3041231,"2020-10":3089201,"2020-11":3112034,"2020-12":3143221,"2021-01":3105423,"2021-02":3089231,"2021-03":3071892,"2021-04":2934521,"2021-05":2888432,"2021-06":2912043,"2021-07":2978234,"2021-08":2989012,"2021-09":2961023,"2021-10":2942831,"2021-11":2921043,"2021-12":2901234,"2022-01":2878432,"2022-02":2856231,"2022-03":2841023,"2022-04":2824312,"2022-05":2798432,"2022-06":2779231,"2022-07":2761023,"2022-08":2744312,"2022-09":2729431,"2022-10":2714023,"2022-11":2698432,"2022-12":2681231,"2023-01":2668023,"2023-02":2652312,"2023-03":2638431,"2023-04":2621023,"2023-05":2608312,"2023-06":2591431,"2023-07":2578023,"2023-08":2562312,"2023-09":2548431,"2023-10":2531023,"2023-11":2518312,"2023-12":2499431,"2024-01":2481023,"2024-02":2462312,"2024-03":2445431,"2024-04":2428023,"2024-05":2411312,"2024-06":2395431,"2024-07":2378023,"2024-08":2362312,"2024-09":2345431,"2024-10":2329023,"2024-11":2312312,"2024-12":2295431};
+
+const REV_CITY = {Ahmedabad:199102392,Bhopal:211888476,Delhi:207422939,Jaipur:194186161,Kanpur:208708575,Lucknow:219863253,Mumbai:223468125,Patna:211083102,Ranchi:211546536,Varanasi:237571920};
+
+const RET_RATE = {Ahmedabad:6.37,Bhopal:5.83,Delhi:6.28,Jaipur:5.77,Kanpur:5.94,Lucknow:6.03,Mumbai:5.71,Patna:6.05,Ranchi:5.83,Varanasi:5.75};
+
+const DIGITAL = [
+  {city:"Lucknow",platform:"WhatsApp",bounce:52.55,cost:302630,users:23509,dl:16319,conv:69.42},
+  {city:"Delhi",platform:"WhatsApp",bounce:82.53,cost:255987,users:19472,dl:17017,conv:87.39},
+  {city:"Bhopal",platform:"WhatsApp",bounce:68.06,cost:288815,users:8471,dl:2891,conv:34.13},
+  {city:"Patna",platform:"WhatsApp",bounce:66.17,cost:226563,users:46796,dl:15640,conv:33.42},
+  {city:"Jaipur",platform:"WhatsApp",bounce:76.90,cost:461550,users:16805,dl:3231,conv:19.23},
+  {city:"Mumbai",platform:"WhatsApp",bounce:45.74,cost:342180,users:31298,dl:14691,conv:46.93},
+  {city:"Ranchi",platform:"WhatsApp",bounce:83.01,cost:198740,users:9821,dl:4488,conv:45.70},
+  {city:"Kanpur",platform:"WhatsApp",bounce:76.14,cost:276340,users:12984,dl:5819,conv:44.82},
+  {city:"Ahmedabad",platform:"WhatsApp",bounce:43.38,cost:312890,users:22341,dl:18848,conv:84.37},
+  {city:"Varanasi",platform:"WhatsApp",bounce:75.39,cost:234120,users:18834,dl:8472,conv:44.97},
+  {city:"Lucknow",platform:"E-paper",bounce:61.23,cost:421830,users:34120,dl:14232,conv:41.71},
+  {city:"Delhi",platform:"E-paper",bounce:71.45,cost:398120,users:28910,dl:11234,conv:38.85},
+  {city:"Bhopal",platform:"E-paper",bounce:74.82,cost:312540,users:19230,dl:6941,conv:36.09},
+  {city:"Patna",platform:"E-paper",bounce:69.31,cost:278340,users:23840,dl:9123,conv:38.27},
+  {city:"Jaipur",platform:"E-paper",bounce:78.92,cost:389120,users:21340,dl:7123,conv:33.39},
+  {city:"Mumbai",platform:"E-paper",bounce:52.10,cost:512340,users:47230,dl:23412,conv:49.57},
+  {city:"Ranchi",platform:"E-paper",bounce:81.34,cost:234120,users:12310,dl:3892,conv:31.62},
+  {city:"Kanpur",platform:"E-paper",bounce:72.89,cost:298340,users:16780,dl:6234,conv:37.15},
+  {city:"Ahmedabad",platform:"E-paper",bounce:55.23,cost:445230,users:38920,dl:18412,conv:47.31},
+  {city:"Varanasi",platform:"E-paper",bounce:76.41,cost:267890,users:14230,dl:4923,conv:34.60}
+];
+
+const READINESS = {
+  Lucknow:{literacy:89.11,smart:75.07,internet:56.81},
+  Delhi:{literacy:70.95,smart:49.13,internet:48.0},
+  Bhopal:{literacy:82.74,smart:68.67,internet:67.15},
+  Patna:{literacy:75.34,smart:67.42,internet:67.5},
+  Jaipur:{literacy:84.76,smart:71.19,internet:10.0},
+  Mumbai:{literacy:82.22,smart:48.2,internet:75.71},
+  Ranchi:{literacy:66.32,smart:75.85,internet:62.02},
+  Kanpur:{literacy:71.26,smart:76.65,internet:74.26},
+  Ahmedabad:{literacy:75.0,smart:68.21,internet:75.01},
+  Varanasi:{literacy:70.79,smart:78.67,internet:75.28}
+};
+
+const SMART_TREND = {
+  Varanasi: [71.2,72.1,71.9,72.5,72.9,73.2,73.0,73.5,73.9,74.2,73.9,74.6,74.1,75.3,75.8,76.9,77.2,77.9,78.5,78.1,78.6,79.0,79.2,78.7],
+  Kanpur:   [68.2,69.1,68.9,69.5,69.9,70.2,71.0,71.5,71.9,72.2,72.9,73.6,73.1,74.3,74.8,75.9,75.2,75.9,76.5,76.1,76.6,77.0,77.2,76.7],
+  Lucknow:  [75.8,76.5,75.3,76.1,76.9,77.2,77.0,77.5,77.9,78.2,77.9,78.6,78.1,77.3,76.8,75.9,75.2,74.9,75.5,75.1,75.6,75.0,75.2,75.1],
+  Mumbai:   [45.2,46.1,45.9,46.5,46.9,45.2,46.1,46.8,45.5,45.9,46.3,46.1,46.6,47.9,47.2,47.8,47.3,47.9,48.1,47.6,48.8,48.2,47.5,48.2],
+  Delhi:    [52.3,53.1,52.9,53.5,53.9,52.2,53.1,53.8,52.5,51.9,52.3,52.1,51.6,50.9,50.2,49.8,49.3,49.9,49.1,49.6,48.8,49.2,49.5,49.1]
+};
+
+// ═══════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════
+let state = {
+  years: new Set([2019,2020,2021,2022,2023,2024]),
+  cats: new Set(["A001","A002","A003","A004"]),
+  tier: "All",
+  plat: "Both",
+  cities: new Set(CITY_LIST)
+};
+
+const charts = {};
+
+// ═══════════════════════════════════════════════════════
+// CHART CONFIG DEFAULTS
+// ═══════════════════════════════════════════════════════
+Chart.defaults.color = "#4a6080";
+Chart.defaults.font.family = "'Instrument Sans', sans-serif";
+Chart.defaults.font.size = 10;
+
+const GRID = { color:"rgba(26,51,86,0.6)", lineWidth:1 };
+const TTIP = {
+  backgroundColor:"rgba(10,22,40,0.96)",
+  borderColor:"rgba(0,229,160,0.25)",
+  borderWidth:1,
+  titleColor:"#00e5a0",
+  bodyColor:"#c8d8ec",
+  padding:10,
+  cornerRadius:6
+};
+
+function mkChart(id, cfg) {
+  if (charts[id]) { charts[id].destroy(); }
+  const ctx = document.getElementById(id);
+  if (!ctx) return;
+  charts[id] = new Chart(ctx, cfg);
+  return charts[id];
+}
+
+// ═══════════════════════════════════════════════════════
+// CHART 1 — REVENUE TREND
+// ═══════════════════════════════════════════════════════
+const CAT_CFG = {
+  A001:{label:"Government",color:"#3d9bff"},
+  A002:{label:"FMCG",color:"#f5a623"},
+  A003:{label:"Real Estate",color:"#a855f7"},
+  A004:{label:"Automobile",color:"#00e5a0"}
+};
+
+function buildRevTrend() {
+  const qs = QUARTERS.filter(q => state.years.has(+q.split("-")[1]));
+  const datasets = [...state.cats].map(cat => ({
+    label: CAT_CFG[cat].label,
+    data: qs.map(q => RAW_REV[q] ? Math.round(RAW_REV[q][cat]/1e5) : 0),
+    borderColor: CAT_CFG[cat].color,
+    backgroundColor: CAT_CFG[cat].color+"18",
+    borderWidth: 2, tension: 0.35, pointRadius: 0, fill: false
+  }));
+  mkChart("revTrendChart", {
+    type:"line", data:{ labels: qs, datasets },
+    options:{ responsive:true, interaction:{mode:"index",intersect:false},
+      plugins:{ legend:{display:true,position:"top",labels:{boxWidth:10,padding:8,font:{size:10}}}, tooltip:{...TTIP,callbacks:{label:c=>`₹${c.parsed.y}L`}} },
+      scales:{
+        x:{grid:GRID,ticks:{maxRotation:45,font:{size:9}}},
+        y:{grid:GRID,ticks:{callback:v=>`₹${v}L`}}
+      }
+    }
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+// CHART 2 — CIRCULATION
+// ═══════════════════════════════════════════════════════
+function buildCirc() {
+  const months = Object.keys(CIRC).filter(m => state.years.has(+m.split("-")[0]));
+  const data = months.map(m => Math.round(CIRC[m]/1000));
+  const labels = months;
+  mkChart("circChart", {
+    type:"line",
+    data:{ labels, datasets:[{
+      label:"Net Circulation (K)",
+      data,
+      borderColor:"#3d9bff",
+      backgroundColor:"rgba(61,155,255,0.08)",
+      fill:true, borderWidth:2, tension:0.35, pointRadius:0
+    }]},
+    options:{ responsive:true, interaction:{mode:"index",intersect:false},
+      plugins:{
+        legend:{display:false},
+        tooltip:{...TTIP,callbacks:{label:c=>`${c.parsed.y}K copies`}},
+        annotation: undefined
+      },
+      scales:{
+        x:{grid:GRID,ticks:{maxRotation:45,font:{size:9},callback:function(v,i){return i%11===0?this.getLabelForValue(v):''}}},
+        y:{grid:GRID,ticks:{callback:v=>`${v}K`},min:2000,max:3600}
+      }
+    }
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+// CHART 3 — DUAL AXIS
+// ═══════════════════════════════════════════════════════
+function buildDual() {
+  const qs = QUARTERS.filter((q,i)=>i%2===0 && state.years.has(+q.split("-")[1]));
+  const revData = qs.map(q=>{
+    if (!RAW_REV[q]) return 0;
+    return Math.round([...state.cats].reduce((s,c)=>s+RAW_REV[q][c],0)/1e5);
+  });
+  const circData = qs.map(q=>{
+    const yr = q.split("-")[1], qn = +q[1];
+    const ms = [(qn-1)*3+1,(qn-1)*3+2,(qn-1)*3+3].map(m=>`${yr}-${String(m).padStart(2,"0")}`);
+    const vals = ms.filter(m=>CIRC[m]).map(m=>CIRC[m]);
+    return vals.length ? Math.round(vals.reduce((a,b)=>a+b,0)/vals.length/1000) : 0;
+  });
+  mkChart("dualChart",{
+    type:"line",
+    data:{labels:qs,datasets:[
+      {label:"Revenue (₹L)",data:revData,borderColor:"#f5a623",backgroundColor:"rgba(245,166,35,0.05)",yAxisID:"y1",borderWidth:2,tension:0.35,pointRadius:0},
+      {label:"Circulation (K)",data:circData,borderColor:"#3d9bff",backgroundColor:"rgba(61,155,255,0.05)",yAxisID:"y2",borderWidth:2,tension:0.35,pointRadius:0}
+    ]},
+    options:{responsive:true,interaction:{mode:"index",intersect:false},
+      plugins:{legend:{display:true,position:"top",labels:{boxWidth:10,padding:8,font:{size:10}}},tooltip:{...TTIP}},
+      scales:{
+        x:{grid:GRID,ticks:{maxRotation:45,font:{size:9}}},
+        y1:{grid:GRID,position:"left",ticks:{callback:v=>`₹${v}L`}},
+        y2:{grid:{display:false},position:"right",ticks:{callback:v=>`${v}K`}}
+      }
+    }
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+// CHART 4 — CITY REVENUE BAR
+// ═══════════════════════════════════════════════════════
+function buildCityRev() {
+  const cities = CITY_LIST.filter(c=>state.cities.has(c) && (state.tier==="All"||CITY_TIER[c]===state.tier));
+  const vals = cities.map(c=>Math.round(REV_CITY[c]/1e7));
+  const colors = cities.map(c=>CITY_COLORS[CITY_LIST.indexOf(c)]);
+  mkChart("cityRevChart",{
+    type:"bar",
+    data:{labels:cities,datasets:[{label:"Revenue (₹Cr)",data:vals,backgroundColor:colors.map(c=>c+"aa"),borderColor:colors,borderWidth:1,borderRadius:4}]},
+    options:{responsive:true,indexAxis:"y",
+      plugins:{legend:{display:false},tooltip:{...TTIP,callbacks:{label:c=>`₹${c.parsed.x} Cr`}}},
+      scales:{x:{grid:GRID,ticks:{callback:v=>`${v}Cr`}},y:{grid:{display:false},ticks:{font:{size:11},color:"#c8d8ec"}}}
+    }
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+// CHART 5 — RETURN RATE
+// ═══════════════════════════════════════════════════════
+function buildReturn() {
+  const cities = [...state.cities].sort((a,b)=>RET_RATE[b]-RET_RATE[a]);
+  const vals = cities.map(c=>RET_RATE[c]);
+  const bgs = vals.map(v=>v>8?"rgba(255,77,94,0.7)":v>5?"rgba(245,166,35,0.7)":"rgba(0,229,160,0.7)");
+  mkChart("returnChart",{
+    type:"bar",
+    data:{labels:cities,datasets:[{label:"Return Rate %",data:vals,backgroundColor:bgs,borderWidth:0,borderRadius:3}]},
+    options:{responsive:true,indexAxis:"y",
+      plugins:{legend:{display:false},tooltip:{...TTIP,callbacks:{label:c=>`${c.parsed.x}%`}}},
+      scales:{
+        x:{grid:GRID,min:0,max:10,ticks:{callback:v=>`${v}%`}},
+        y:{grid:{display:false},ticks:{font:{size:11},color:"#c8d8ec"}}
+      }
+    }
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+// CHART 6 — BOUNCE RATE
+// ═══════════════════════════════════════════════════════
+function buildBounce() {
+  const platOk = d => state.plat==="Both" || d.platform===state.plat;
+  const cityOk = d => state.cities.has(d.city);
+  const filtered = DIGITAL.filter(d=>platOk(d)&&cityOk(d));
+  const cities = [...new Set(filtered.map(d=>d.city))];
+  const waDat = cities.map(c=>{const x=filtered.find(d=>d.city===c&&d.platform==="WhatsApp"); return x?x.bounce:null;});
+  const epDat = cities.map(c=>{const x=filtered.find(d=>d.city===c&&d.platform==="E-paper"); return x?x.bounce:null;});
+  const datasets = [];
+  if (state.plat==="Both"||state.plat==="WhatsApp") datasets.push({label:"WhatsApp Push",data:waDat,backgroundColor:"rgba(245,166,35,0.75)",borderColor:"#f5a623",borderWidth:1,borderRadius:3});
+  if (state.plat==="Both"||state.plat==="E-paper") datasets.push({label:"E-paper Web",data:epDat,backgroundColor:"rgba(168,85,247,0.75)",borderColor:"#a855f7",borderWidth:1,borderRadius:3});
+  mkChart("bounceChart",{
+    type:"bar",
+    data:{labels:cities,datasets},
+    options:{responsive:true,
+      plugins:{legend:{display:true,position:"top",labels:{boxWidth:10,padding:8,font:{size:10}}},
+        tooltip:{...TTIP,callbacks:{label:c=>`${c.parsed.y}%`}},
+        annotation:{annotations:{line1:{type:"line",yMin:60,yMax:60,borderColor:"rgba(255,77,94,0.7)",borderWidth:1,borderDash:[4,3],label:{content:"60% threshold",display:true,color:"#ff4d5e",font:{size:9}}}}}
+      },
+      scales:{
+        x:{grid:GRID,ticks:{maxRotation:30,font:{size:9}}},
+        y:{grid:GRID,max:100,ticks:{callback:v=>`${v}%`}}
+      }
+    }
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+// CHART 7 — SCATTER
+// ═══════════════════════════════════════════════════════
+function buildScatter() {
+  const platOk = d => state.plat==="Both" || d.platform===state.plat;
+  const cityOk = d => state.cities.has(d.city);
+  const waData = DIGITAL.filter(d=>d.platform==="WhatsApp"&&platOk(d)&&cityOk(d)).map(d=>({x:Math.round(d.cost/1000),y:d.conv,city:d.city,users:d.users}));
+  const epData = DIGITAL.filter(d=>d.platform==="E-paper"&&platOk(d)&&cityOk(d)).map(d=>({x:Math.round(d.cost/1000),y:d.conv,city:d.city,users:d.users}));
+  const datasets = [];
+  if (state.plat==="Both"||state.plat==="WhatsApp") datasets.push({label:"WhatsApp Push",data:waData,backgroundColor:"rgba(245,166,35,0.7)",borderColor:"#f5a623",pointRadius:7,borderWidth:1});
+  if (state.plat==="Both"||state.plat==="E-paper") datasets.push({label:"E-paper Web",data:epData,backgroundColor:"rgba(168,85,247,0.7)",borderColor:"#a855f7",pointRadius:7,borderWidth:1});
+  mkChart("scatterChart",{
+    type:"scatter",
+    data:{datasets},
+    options:{responsive:true,
+      plugins:{legend:{display:true,position:"top",labels:{boxWidth:10,padding:8,font:{size:10}}},
+        tooltip:{...TTIP,callbacks:{label:c=>`${c.raw.city}: ₹${c.raw.x}K cost, ${c.raw.y}% conv`}}
+      },
+      scales:{
+        x:{grid:GRID,title:{display:true,text:"Total Cost (₹K)",color:"#4a6080",font:{size:9}},ticks:{callback:v=>`₹${v}K`}},
+        y:{grid:GRID,title:{display:true,text:"Conversion %",color:"#4a6080",font:{size:9}},ticks:{callback:v=>`${v}%`}}
+      }
+    }
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+// FUNNEL LIST
+// ═══════════════════════════════════════════════════════
+function buildFunnel() {
+  const platOk = d => state.plat==="Both" || d.platform===state.plat;
+  const cityOk = d => state.cities.has(d.city);
+  const items = DIGITAL.filter(d=>platOk(d)&&cityOk(d)).sort((a,b)=>b.conv-a.conv);
+  const el = document.getElementById("funnelList");
+  el.innerHTML = items.map(d=>{
+    const col = d.conv>60?"var(--emerald)":d.conv>40?"var(--amber)":"var(--crimson)";
+    const tag = d.platform==="WhatsApp"?"WA":"EP";
+    return `<div class="funnel-item">
+      <div class="funnel-header">
+        <span class="funnel-city">${d.city} <span style="color:var(--muted);font-size:9px">(${tag})</span></span>
+        <span class="funnel-pct" style="color:${col}">${d.conv}%</span>
+      </div>
+      <div class="funnel-track"><div class="funnel-fill" style="width:${d.conv}%;background:${col}"></div></div>
+      <div class="funnel-detail">${d.dl.toLocaleString()} / ${d.users.toLocaleString()} reached</div>
+    </div>`;
+  }).join("");
+}
+
+// ═══════════════════════════════════════════════════════
+// CHART 9 — RADAR
+// ═══════════════════════════════════════════════════════
+function buildRadar() {
+  const top5 = ["Varanasi","Kanpur","Lucknow","Ahmedabad","Jaipur"];
+  const colors5 = top5.map(c=>CITY_COLORS[CITY_LIST.indexOf(c)]);
+  mkChart("radarChart",{
+    type:"radar",
+    data:{
+      labels:["Literacy Rate","Smartphone %","Internet %"],
+      datasets: top5.map((city,i)=>({
+        label:city,
+        data:[READINESS[city].literacy,READINESS[city].smart,READINESS[city].internet],
+        borderColor:colors5[i],
+        backgroundColor:colors5[i]+"18",
+        borderWidth:2,pointRadius:3
+      }))
+    },
+    options:{responsive:true,
+      plugins:{legend:{display:true,position:"top",labels:{boxWidth:8,padding:6,font:{size:10}}},tooltip:{...TTIP}},
+      scales:{r:{grid:{color:"rgba(26,51,86,0.8)"},pointLabels:{color:"#c8d8ec",font:{size:11}},ticks:{display:false},suggestedMin:0,suggestedMax:100,angleLines:{color:"rgba(26,51,86,0.6)"}}}
+    }
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+// CHART 10 — SMARTPHONE TREND
+// ═══════════════════════════════════════════════════════
+function buildSmart() {
+  const qs = QUARTERS.filter((_,i)=>i%2===0 && state.years.has(+QUARTERS[i*2]?.split("-")[1] || +_.split("-")[1]));
+  const labels = qs;
+  const cities5 = ["Varanasi","Kanpur","Lucknow","Mumbai","Delhi"];
+  const datasets = cities5.map((city,i)=>({
+    label:city,
+    data: qs.map(q=>{
+      const idx = QUARTERS.indexOf(q);
+      return SMART_TREND[city]?.[idx] ?? null;
+    }),
+    borderColor:CITY_COLORS[CITY_LIST.indexOf(city)],
+    backgroundColor:"transparent",
+    borderWidth:1.5,tension:0.35,pointRadius:0
+  }));
+  datasets.push({label:"70% Threshold",data:qs.map(()=>70),borderColor:"rgba(0,229,160,0.5)",borderDash:[5,4],borderWidth:1.5,pointRadius:0,backgroundColor:"transparent"});
+  mkChart("smartChart",{
+    type:"line",data:{labels,datasets},
+    options:{responsive:true,interaction:{mode:"index",intersect:false},
+      plugins:{legend:{display:true,position:"top",labels:{boxWidth:8,padding:6,font:{size:10}}},tooltip:{...TTIP,callbacks:{label:c=>`${c.dataset.label}: ${c.parsed.y}%`}}},
+      scales:{
+        x:{grid:GRID,ticks:{maxRotation:30,font:{size:9}}},
+        y:{grid:GRID,min:40,max:85,ticks:{callback:v=>`${v}%`}}
+      }
+    }
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+// CHART 11 — POTENTIAL
+// ═══════════════════════════════════════════════════════
+function buildPotential() {
+  const cities = CITY_LIST.filter(c=>state.cities.has(c)&&(state.tier==="All"||CITY_TIER[c]===state.tier));
+  const current = cities.map(c=>Math.round(REV_CITY[c]/6/1e5));
+  const potential = cities.map(c=>Math.round(REV_CITY[c]/6/1e5*(1+READINESS[c].smart/100*0.8)));
+  mkChart("potentialChart",{
+    type:"bar",
+    data:{labels:cities,datasets:[
+      {label:"Current Avg/Year",data:current,backgroundColor:"rgba(61,155,255,0.6)",borderColor:"#3d9bff",borderWidth:1,borderRadius:3},
+      {label:"Potential w/ Digital",data:potential,backgroundColor:"rgba(0,229,160,0.45)",borderColor:"#00e5a0",borderWidth:1,borderRadius:3}
+    ]},
+    options:{responsive:true,
+      plugins:{legend:{display:true,position:"top",labels:{boxWidth:10,padding:8,font:{size:10}}},tooltip:{...TTIP,callbacks:{label:c=>`₹${c.parsed.y}L`}}},
+      scales:{
+        x:{grid:GRID,ticks:{maxRotation:30,font:{size:9}}},
+        y:{grid:GRID,ticks:{callback:v=>`₹${v}L`}}
+      }
+    }
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+// CHART 12 — BUBBLE (readiness vs revenue)
+// ═══════════════════════════════════════════════════════
+function buildBubble() {
+  const cities = CITY_LIST.filter(c=>state.cities.has(c)&&(state.tier==="All"||CITY_TIER[c]===state.tier));
+  mkChart("bubbleChart",{
+    type:"bubble",
+    data:{
+      datasets:[{
+        label:"City",
+        data: cities.map(c=>({
+          x: READINESS[c].smart,
+          y: Math.round(REV_CITY[c]/6/1e7*10)/10,
+          r: Math.max(6, Math.round(REV_CITY[c]/6/1e7)*0.7),
+          city: c, tier: CITY_TIER[c]
+        })),
+        backgroundColor: cities.map(c=>CITY_COLORS[CITY_LIST.indexOf(c)]+"90"),
+        borderColor: cities.map(c=>CITY_COLORS[CITY_LIST.indexOf(c)]),
+        borderWidth:1
+      }]
+    },
+    options:{responsive:true,
+      plugins:{
+        legend:{display:false},
+        tooltip:{...TTIP,callbacks:{label:c=>`${c.raw.city} (${c.raw.tier}) · Smart: ${c.raw.x}% · Rev: ₹${c.raw.y}Cr`}}
+      },
+      scales:{
+        x:{grid:GRID,min:40,max:85,title:{display:true,text:"Smartphone Penetration %",color:"#4a6080",font:{size:10}},ticks:{callback:v=>`${v}%`}},
+        y:{grid:GRID,title:{display:true,text:"Avg Annual Revenue (₹Cr)",color:"#4a6080",font:{size:10}},ticks:{callback:v=>`₹${v}Cr`}}
+      }
+    }
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+// CHART 13 — PIE
+// ═══════════════════════════════════════════════════════
+function buildPie() {
+  const yr2024Qs = QUARTERS.filter(q=>q.includes("2024"));
+  const totals = {};
+  [...state.cats].forEach(cat=>{
+    totals[cat] = yr2024Qs.reduce((s,q)=>s+(RAW_REV[q]?.[cat]||0),0);
+  });
+  const total = Object.values(totals).reduce((a,b)=>a+b,0);
+  const labels = [...state.cats].map(c=>CAT_CFG[c].label);
+  const data = [...state.cats].map(c=>Math.round(totals[c]/1e5));
+  const colors = [...state.cats].map(c=>CAT_CFG[c].color);
+  const pcts = [...state.cats].map(c=>(totals[c]/total*100).toFixed(1));
+  mkChart("pieChart",{
+    type:"doughnut",
+    data:{labels,datasets:[{data,backgroundColor:colors.map(c=>c+"cc"),borderColor:colors,borderWidth:2,hoverOffset:8}]},
+    options:{responsive:true,cutout:"58%",
+      plugins:{
+        legend:{display:true,position:"bottom",labels:{boxWidth:10,padding:10,font:{size:11}}},
+        tooltip:{...TTIP,callbacks:{label:c=>`${c.label}: ₹${c.parsed}L (${pcts[c.dataIndex]}%)`}}
+      }
+    }
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+// FILTER HANDLERS
+// ═══════════════════════════════════════════════════════
+function toggleYear(btn) {
+  const yr = +btn.dataset.yr;
+  if (state.years.has(yr)) { if (state.years.size>1) state.years.delete(yr); }
+  else state.years.add(yr);
+  btn.classList.toggle("active-emerald", state.years.has(yr));
+  refreshAll();
+}
+function toggleCat(btn) {
+  const cat = btn.dataset.cat;
+  if (state.cats.has(cat)) { if (state.cats.size>1) state.cats.delete(cat); }
+  else state.cats.add(cat);
+  btn.classList.toggle("active-blue", state.cats.has(cat));
+  refreshAll();
+}
+function toggleTier(btn) {
+  document.querySelectorAll("#tier-pills .pill").forEach(p=>p.classList.remove("active-amber"));
+  btn.classList.add("active-amber");
+  state.tier = btn.dataset.tier;
+  refreshAll();
+}
+function togglePlat(btn) {
+  document.querySelectorAll("#plat-pills .pill").forEach(p=>p.classList.remove("active-purple"));
+  btn.classList.add("active-purple");
+  state.plat = btn.dataset.plat;
+  refreshAll();
+}
+function toggleCity(btn) {
+  const city = btn.dataset.city;
+  if (state.cities.has(city)) { if (state.cities.size>1) state.cities.delete(city); }
+  else state.cities.add(city);
+  btn.classList.toggle("active-emerald", state.cities.has(city));
+  refreshAll();
+}
+function resetFilters() {
+  state.years = new Set([2019,2020,2021,2022,2023,2024]);
+  state.cats = new Set(["A001","A002","A003","A004"]);
+  state.tier = "All"; state.plat = "Both";
+  state.cities = new Set(CITY_LIST);
+  document.querySelectorAll("#yr-pills .pill").forEach(p=>p.classList.add("active-emerald"));
+  document.querySelectorAll("#cat-pills .pill").forEach(p=>p.classList.add("active-blue"));
+  document.querySelectorAll("#tier-pills .pill").forEach(p=>{p.classList.remove("active-amber");if(p.dataset.tier==="All")p.classList.add("active-amber");});
+  document.querySelectorAll("#plat-pills .pill").forEach(p=>{p.classList.remove("active-purple");if(p.dataset.plat==="Both")p.classList.add("active-purple");});
+  document.querySelectorAll("#city-pills .pill").forEach(p=>p.classList.add("active-emerald"));
+  refreshAll();
+}
+
+function refreshAll() {
+  buildRevTrend(); buildCirc(); buildDual();
+  buildCityRev(); buildReturn();
+  buildBounce(); buildScatter(); buildFunnel();
+  buildRadar(); buildSmart(); buildPotential();
+  buildBubble(); buildPie();
+}
+
+// ═══════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════
+window.addEventListener("load", refreshAll);
+</script>
+</body>
+</html>
