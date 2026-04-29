@@ -1,0 +1,184 @@
+###📰 Bharat Herald Digital Transformation Analysis
+##📌 Project Overview
+
+This project was completed as part of the Codebasics Resume Challenge, focusing on Bharat Herald — a 70-year-old newspaper facing decline in the post-COVID digital era.
+
+Using 5 years of operational and financial data, the goal was to analyze the drop in print circulation, declining ad revenue, and evaluate opportunities for digital transformation.
+
+##🎯 Objectives
+
+
+Analyze print circulation trends (2019–2024)
+
+
+Identify high-performing and underperforming cities
+
+
+Evaluate ad revenue trends across categories
+
+
+Assess print inefficiencies (waste & returns)
+
+
+Measure digital pilot performance
+
+
+Recommend a data-driven digital strategy
+
+
+
+##📊 Key Insights
+#📉 Print Decline
+
+
+Circulation dropped from 1.2M+ to <560K copies
+
+
+Overall decline of ~25% in recent years
+
+
+#🧾 Print Inefficiency
+
+
+Print waste reached ~10%
+
+
+Jaipur had highest circulation and highest inefficiency
+
+
+#💰 Revenue Trends
+
+
+Ad revenue declined across most categories
+
+
+Strong dependency on government & real estate ads
+
+
+#🏙️ City-Level Insights
+
+
+Patna → Highest ROI (stable ads + digital engagement)
+
+
+Jaipur → High waste, needs optimization
+
+
+Varanasi, Lucknow, Kanpur → High digital readiness
+
+
+#📱 Digital Pilot Findings
+
+
+High bounce rates (poor UX)
+
+
+Low engagement despite investment
+
+
+Clear mismatch between product and user behavior
+
+
+
+##🚀 Strategic Recommendations
+Phase 1: Relaunch (0–6 months)
+
+
+Mobile-first platform
+
+
+WhatsApp-based news delivery
+
+
+Focus on high-readiness cities
+
+
+Phase 2: Content Transformation (6–18 months)
+
+
+Short videos, podcasts, infographics
+
+
+Regional & vernacular content strategy
+
+
+Phase 3: Monetization & Scale (18+ months)
+
+
+Subscription model
+
+
+Loyalty programs
+
+
+Pay-per-article system
+
+
+
+##🛠️ Tools & Technologies
+
+
+Python (Data Analysis)
+
+
+SQL (Data Extraction)
+
+
+Excel (Exploration & Cleaning)
+
+
+Power BI (Dashboard & Visualization)
+
+
+
+##📊 Dashboard Preview
+Interactive dashboard built to visualize:
+
+
+Revenue trends
+
+
+Circulation decline
+
+
+City performance
+
+
+Digital readiness
+
+
+👉 Check the dashboard here:
+📁 BharatHerald_Dashboard.html 
+
+📂 Dataset & Analysis
+
+
+Primary & secondary analysis performed on multi-source data
+
+
+Covered circulation, revenue, and digital metrics 
+
+
+
+📈 What I Learned
+
+
+Translating raw data into business strategy
+
+
+Identifying real-world operational inefficiencies
+
+
+Connecting digital metrics with revenue impact
+
+
+Storytelling with data for decision-making
+
+
+
+🔗 Author
+Aleeja Ambili
+Aspiring Data Analyst | Python | SQL | Power BI
+
+
+
