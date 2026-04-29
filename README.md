@@ -1,6 +1,6 @@
 # Bharat-Herald---Strategic-Intelligence-Report
 
-##🎯 Objectives
+## 🎯 Objectives
 
 
 Analyze print circulation trends (2019–2024)
@@ -22,9 +22,9 @@ Recommend a data-driven digital strategy
 
 
 
-##📊 Key Insights
+## 📊 Key Insights
 
-###📉 Print Decline
+### 📉 Print Decline
 
 
 Circulation dropped from 1.2M+ to <560K copies
@@ -33,7 +33,7 @@ Circulation dropped from 1.2M+ to <560K copies
 Overall decline of ~25% in recent years
 
 
-###🧾 Print Inefficiency
+### 🧾 Print Inefficiency
 
 
 Print waste reached ~10%
@@ -42,7 +42,7 @@ Print waste reached ~10%
 Jaipur had highest circulation and highest inefficiency
 
 
-💰 Revenue Trends
+### 💰 Revenue Trends
 
 
 Ad revenue declined across most categories
@@ -51,7 +51,7 @@ Ad revenue declined across most categories
 Strong dependency on government & real estate ads
 
 
-###🏙️ City-Level Insights
+### 🏙️ City-Level Insights
 
 
 Patna → Highest ROI (stable ads + digital engagement)
@@ -63,7 +63,7 @@ Jaipur → High waste, needs optimization
 Varanasi, Lucknow, Kanpur → High digital readiness
 
 
-###📱 Digital Pilot Findings
+### 📱 Digital Pilot Findings
 
 
 High bounce rates (poor UX)
@@ -76,8 +76,9 @@ Clear mismatch between product and user behavior
 
 
 
-##🚀 Strategic Recommendations
-Phase 1: Relaunch (0–6 months)
+## 🚀 Strategic Recommendations
+
+### Phase 1: Relaunch (0–6 months)
 
 
 Mobile-first platform
@@ -89,7 +90,7 @@ WhatsApp-based news delivery
 Focus on high-readiness cities
 
 
-Phase 2: Content Transformation (6–18 months)
+### Phase 2: Content Transformation (6–18 months)
 
 
 Short videos, podcasts, infographics
@@ -98,7 +99,7 @@ Short videos, podcasts, infographics
 Regional & vernacular content strategy
 
 
-Phase 3: Monetization & Scale (18+ months)
+### Phase 3: Monetization & Scale (18+ months)
 
 
 Subscription model
@@ -111,7 +112,7 @@ Pay-per-article system
 
 
 
-🛠️ Tools & Technologies
+## 🛠️ Tools & Technologies
 
 
 Python (Data Analysis)
@@ -127,7 +128,8 @@ Power BI (Dashboard & Visualization)
 
 
 
-📊 Dashboard Preview
+## 📊 Dashboard Preview
+
 Interactive dashboard built to visualize:
 
 
